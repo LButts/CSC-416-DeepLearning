@@ -5,6 +5,7 @@ from __future__ import print_function
 # Imports
 import numpy as np
 import tensorflow as tf
+import svhn_read
 
 tf.logging.set_verbosity(tf.logging.INFO)
 
@@ -74,4 +75,40 @@ def cnn_model_fn(features, labesl, mode):
         return tf.estimator.EstimatorSpec(
             mode=mode, loss=loss, eval_metric_ops=eval_metric_ops)
 
+
+
+def main(argv):
+
+    """
+        Here is where all fo the code to load the data in from
+        from svhn_read needs to go
+    """
+
+    svhn_classifier = tf.estimator.Estimator(
+        model_fn = cnn_model_fn, model_dir="/tmp/svhn_concnn_model")
+
+    tensorLog = {"probabilities": "softmax_tensor"}
+    logHook = tf.train.LoggingTensorHook(tensors=tensorLog, every_n_iter=50)
+
+    train_input_fn = tf.estimator.inputs.numpy_input_fn(
+        x={"x": train_data},
+        y=train_labels,
+        batch_size = 125,
+        num_epochs=None,
+        shuffle=True)
+    svhn_classifier.train(
+        input_fn=train_input_fn,
+        steps=20000,
+        hooks=[logHook])
+
+    eval_input_fn = tf.estimator.inputs.numpy_input_fn(
+        x={"x": eval_data},
+        y=eval_labels,
+        num_epochs=1,
+        shuffle=False)
+    eval_results = svhn_classifier.evaluate(input_fn)
+    print(eval_results)
         
+
+if __name__ == "__main__":
+    tf.app.run()
