@@ -7,6 +7,7 @@ import numpy as np
 import tensorflow as tf
 import scipy.io
 import os
+import sys
 from six.moves.urllib.request import urlretrieve
 
 DATA_PATH = "Data/"
@@ -59,16 +60,21 @@ def get_file_name(dataset):
 def create_sets(dataset):
     df_name = get_file_name(dataset)
     df_pointer = os.path.join(DATA_PATH, df_name)
+    print(df_pointer)
 
     if(not os.path.exists(df_pointer)):
+        print("no file, checking for folder")
         if (not os.path.exists(DATA_PATH)):
+            print("no directory, making one")
             os.makedirs(DATA_PATH)
 
     if os.path.isfile(df_pointer):
+        print('reading data')
         pull_data = readf(df_pointer)
         return pull_data
 
     else:
+        print('downloading and shit')
         new_file = do_down(DATA_PATH, df_name)
         return readf(new_file)
 
@@ -85,7 +91,7 @@ def do_down(path, filename):
         base_url + filename,
         os.path.join(path, filename),
         reporthook = prog_down)
-    print("\n Download Completed\n")
+    print("\nDownload Completed\n")
     statinfo = os.stat(down_file)
     if statinfo.st_size == get_expected_bytes(filename):
         print(down_file, "  found and verified")
@@ -123,17 +129,30 @@ def file_gen():
     test_data, test_labels = create_sets('test')
     write_npy_file(test_data, test_labels, 'test')
 
+def extra_set_gen():
+    extra_data, extra_labels = create_sets('extra')
+    write_npy_file(extra_data, extra_labels, 'extra')
+
 def load_data(setname):
     pics = np.load(os.path.join(DATA_PATH, setname+'_svhn_pics.npy'))
     labels = np.load(os.path.join(DATA_PATH, setname+'_svhn_labels.npy'))
     return pics, labels
 
 def write_npy_file(data_array, label_array, setname):
-    np.save(os.path.join(DATA_PATH, setname+'_svhn_pics.npy'), data_array)
-    print('Saving to %s_svhn_pics.npy file done.' %setname)
-    np.save(os.path.join(DATA_PATH, setname+'_svhn_labels.npy'), label_array)
-    print('Saving to %s_svhn_labels.npy done.' %setname)
+    ndat_pointer = os.path.join(DATA_PATH, setname+'_svhn_pics.npy')
+    nlabel_pointer = os.path.join(DATA_PATH, setname+'_svhn_labels.npy')
 
+    if(not os.path.exists(ndat_pointer)):
+        np.save(ndat_pointer, data_array)
+        print('Saving to %s_svhn_pics.npy file done.' %setname)
+    else:
+        print("\nFile already converted to numpy array\n")
+
+    if(not os.path.exists(nlabel_pointer)):
+        np.save(nlabel_pointer, label_array)
+        print('Saving to %s_svhn_labels.npy file done.\n' %setname)
+    else:
+        print("\nFile already converted to numpy array\n")
 
 if __name__ == "__main__":
     file_gen()
