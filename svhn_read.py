@@ -103,3 +103,32 @@ def prog_down(count, block_size, total_size):
             sys.stdout.write(".")
             sys.stdout.flush()
         last_percent_reported = percent
+
+def get_expected_bytes(filename):
+    if filename == "train_32x32.mat":
+        byte_size = 182040794
+    elif filename == "test_32x32.mat":
+        byte_size = 64275384
+    elif filename == "extra_32x32.mat":
+        byte_size = 1329278602
+    else:
+        raise Exception("Invalid file name " + filename)
+    return byte_size
+
+def file_gen():
+    train_data, train_labels = create_sets('train')
+    write_npy_file(train_data, train_labels, 'train')
+
+    test_data, test_labels = create_sets('test')
+    write_npy_file(test_data, test_labels, 'test')
+
+def load_data(setname):
+    pics = np.load(os.path.join(DATA_PATH, setname+'_svhn_pics.npy'))
+    labels = np.load(os.path.join(DATA_PATH, setname+'_svhn_labels.npy'))
+    return pics, labels
+
+def write_npy_file(data_array, label_array, setname):
+    np.save(os.path.join(DATA_PATH, setname+'_svhn_pics.npy'), data_array)
+    print('Saving to %s_svhn_pics.npy file done.' %setname)
+    np.save(os.path.join(DATA_PATH, setname+'_svhn_labels.npy'), label_array)
+    print('Saving to %s_svhn_labels.npy done.' %setname)
