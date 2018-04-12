@@ -5,7 +5,6 @@ from __future__ import print_function
 # Imports
 import numpy as np
 import tensorflow as tf
-import svhn_read
 
 tf.logging.set_verbosity(tf.logging.INFO)
 
@@ -108,7 +107,7 @@ def main(argv):
         shuffle=False)
     eval_results = svhn_classifier.evaluate(input_fn)
     print(eval_results)
-        
+
 
 if __name__ == "__main__":
     tf.app.run()
