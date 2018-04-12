@@ -144,13 +144,13 @@ def write_npy_file(data_array, label_array, setname):
         np.save(ndat_pointer, data_array)
         print('Saving to %s_svhn_pics.npy file done.' %setname)
     else:
-        print("\nFile already converted to numpy array\n")
+        print("File already converted to numpy array")
 
     if(not os.path.exists(nlabel_pointer)):
         np.save(nlabel_pointer, label_array)
         print('Saving to %s_svhn_labels.npy file done.\n' %setname)
     else:
-        print("\nFile already converted to numpy array\n")
+        print("File already converted to numpy array\n")
 
 if __name__ == "__main__":
     file_gen()
