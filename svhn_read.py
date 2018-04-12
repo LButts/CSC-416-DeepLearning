@@ -60,21 +60,19 @@ def get_file_name(dataset):
 def create_sets(dataset):
     df_name = get_file_name(dataset)
     df_pointer = os.path.join(DATA_PATH, df_name)
-    print(df_pointer)
 
     if(not os.path.exists(df_pointer)):
-        print("no file, checking for folder")
+        print("No file, checking for folder")
         if (not os.path.exists(DATA_PATH)):
-            print("no directory, making one")
+            print("No directory, making one")
             os.makedirs(DATA_PATH)
 
     if os.path.isfile(df_pointer):
-        print('reading data')
+        print('File found, reading data')
         pull_data = readf(df_pointer)
         return pull_data
 
     else:
-        print('downloading and shit')
         new_file = do_down(DATA_PATH, df_name)
         return readf(new_file)
 
