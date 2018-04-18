@@ -19,11 +19,11 @@ last_percent_reported = None
 def process_data(file):
     data = scipy.io.loadmat(file)
     pics = data['X']
-    labels = data['y'].flatten()
+    labels = data['y'].flatten().astype(np.int32)
     labels[labels==10] = 0
-    one_hot_labels = make_one_hot(labels)
+    #one_hot_labels = make_one_hot(labels)
     pic_array = make_pics_arr(pics)
-    return pic_array, one_hot_labels
+    return pic_array, labels
 
 def make_one_hot(labels):
     labels = (np.arange(NUM_LABELS) == labels[:, None]).astype(np.float32)
