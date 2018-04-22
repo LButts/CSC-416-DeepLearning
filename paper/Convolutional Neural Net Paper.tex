@@ -7,7 +7,7 @@
 % to avoid loading the natbib package, add option nonatbib:
 % \usepackage[nonatbib]{nips_2017}
 
-\usepackage{nips_2017}
+\usepackage[final]{nips_2017}
 
 % to compile a camera-ready version, add the [final] option, e.g.:
 % \usepackage[final]{nips_2017}
@@ -20,8 +20,9 @@
 \usepackage{amsfonts}       % blackboard math symbols
 \usepackage{nicefrac}       % compact symbols for 1/2, etc.
 \usepackage{microtype}      % microtypography
+\usepackage{xspace}
 
-\title{Formatting instructions for NIPS 2017}
+\title{Applying a Convolutional Neural Net to Street View House Numbers}
 
 % The \author macro works with any number of authors. There are two
 % commands used to separate the names and addresses of multiple
@@ -41,6 +42,8 @@
 	\texttt{Levi.Butts@mines.sdsmt.edu} \\
 }
 
+\newcommand{\MATLAB}{\textsc{Matlab}\xspace}
+
 \begin{document}
 	% \nipsfinalcopy is no longer used
 	
@@ -55,116 +58,57 @@
 		one paragraph.
 	\end{abstract}
 	
-	\section{Submission of papers to NIPS 2017}
+	\section{Introduction}
 	
-	NIPS requires electronic submissions.  The electronic submission site
-	is
+	Properly identifying text characters from photographs, in a timely manner, is one of the quintessential problems that machine learning programs aim to solve.  While the classification of controlled and restricted datasets is by and large a solved problem (i.e. recognizing handwritten digits, or characters in printed documents), performing similar tasks on images of natural scenes becomes much more difficult.  Natural phenomena: severe blur, distortion, illumination effects, etc. when coupled with the wide variation of font styles and display methods, are incredibly difficult to compensate for by hand.  A neural network operating on a learned feature-based classification method, such as image convolution, harbors plenty of potential to adequately handle this problem.   Utilizing a benchmark dataset captured from Google Street View images, which consists of over 600,000 digit images, this work will demonstrate the effectiveness of learned feature classification.
+	
+	Character recognition in images is a well studied, and well documented problem, with years of focused research performed by both academia and industry.  The MNIST digit dataset has been so thoroughly addressed that now it is used mainly as a jumping off point for machine learning beginners.  Any number of tutorials for the MNIST dataset can be found that produce near perfect accuracy with 'off-the-shelf' algorithms.  
+	
+	For this paper, the main focus will rest on taking the well-honed techniques used for the MNIST dataset and applying them to a restricted instance of scene-text recognition.  Namely the classification of house number signs in street level images from the Google Street View House Numbers (SVHN) dataset.  As stated previously, MNIST has been a valued standard for researchers seeking to improve their learning systems to compare against.  The SVHN dataset can be noted to have a style similar to MNIST, but SVHN comprises itself of data that comes from a significantly harder real world problem, and contains an order of magnitude more data than MNIST.
+	
+	To start, I will walk through details of the SVHN dataset in Section \ref{dt_set}, as well as the associated task of preparing and pre-processing required to properly interface the data with Tensorflow in Section \ref{pre-proc}.  Section \ref{model} will be an overview of the model design and the associated results will be discussed in Section \ref{results}.  All of this should adequately convey the power associated with feature based classification executed via a convolutional neural net.
+	
+	\section{Street View House Numbers (SVHN) Dataset}
+	\label{dt_set}
+	
+	The SVHN dataset was compiled from a large number of Street View images from urban areas in various countries.  The house-numbers were extracted via a sliding window detector (cite source).  The dataset was then made available in two formats:
+	
+	\begin{itemize}
+		\item Full Numbers - these are the original, variable resolution, color house-number images. Each image has character level bounding boxes and a transcription of the detected digits.
+		
+		\item Cropped Digits - these are formatted versions of the original images to resemble the MNIST set. Each image has been cropped and resized to be a fixed resolution of 32-by-32 pixels with the digit centered.
+		  
+	\end{itemize}
+	
+	As is explained in (cite source here), the original collection of images for SVHN were compiled with the intent of using an end-to-end system that first detects the location of a house number in a larger image, then uses a detection stage to classify each digit (0 through 9).  For the purposes of this work I utilized the more controlled version of cropped images.  The cropped images were selected because the task of locating, identifying and processing the original images is a separate problem in and of itself.
+	
+	The dataset is divided into a total of three subsets:
+	
+	\begin{itemize}
+		
+		\item SVHN train - 73,257 digits for training
+		\item SVHN test - 26,032 digits for testing
+		\item SVHN extra - 531,131 additional, marginally less difficult samples, to use as extra training data
+		
+	\end{itemize}
+
+	The first 2 subsets were obtained from a large number of Street View images. Even though SVHN-extra was generated in a similar manner, it is generally easier than SVHN-train and SVHN-test as a result of changes made to generate a dataset of such a large size.
+	
+	
+	\section{Data Pre-processing}
+	\label{pre-proc}
+		
+	The SVHN dataset is available for free on the Internet and can be found at
 	\begin{center}
-		\url{https://cmt.research.microsoft.com/NIPS2017/}
+		\url{http://ufldl.stanford.edu/housenumbers/}
 	\end{center}
+	where both the full-number and cropped-digit versions are available.
 	
-	Please read carefully the instructions below and follow them
-	faithfully.
-	
-	\subsection{Style}
-	
-	Papers to be submitted to NIPS 2017 must be prepared according to the
-	instructions presented here. Papers may only be up to eight pages
-	long, including figures. This does not include acknowledgments and 
-	cited references which are allowed on subsequent pages.
-	Papers that exceed these limits will not be reviewed, or in any
-	other way considered for presentation at the conference.
-	
-	The margins in 2017 are the same as since 2007, which allow for
-	$\sim$$15\%$ more words in the paper compared to earlier years.
-	
-	Authors are required to use the NIPS \LaTeX{} style files obtainable
-	at the NIPS website as indicated below. Please make sure you use the
-	current files and not previous versions. Tweaking the style files may
-	be grounds for rejection.
-	
-	\subsection{Retrieval of style files}
-	
-	The style files for NIPS and other conference information are
-	available on the World Wide Web at
-	\begin{center}
-		\url{http://www.nips.cc/}
-	\end{center}
-	The file \verb+nips_2017.pdf+ contains these instructions and
-	illustrates the various formatting requirements your NIPS paper must
-	satisfy.
-	
-	The only supported style file for NIPS 2017 is \verb+nips_2017.sty+,
-	rewritten for \LaTeXe{}.  \textbf{Previous style files for \LaTeX{}
-		2.09, Microsoft Word, and RTF are no longer supported!}
-	
-	The new \LaTeX{} style file contains two optional arguments:
-	\verb+final+, which creates a camera-ready copy, and \verb+nonatbib+,
-	which will not load the \verb+natbib+ package for you in case of
-	package clash.
-	
-	At submission time, please omit the \verb+final+ option. This will
-	anonymize your submission and add line numbers to aid review.  Please
-	do \emph{not} refer to these line numbers in your paper as they will
-	be removed during generation of camera-ready copies.
-	
-	The file \verb+nips_2017.tex+ may be used as a ``shell'' for writing
-	your paper. All you have to do is replace the author, title, abstract,
-	and text of the paper with your own.
-	
-	The formatting instructions contained in these style files are
-	summarized in Sections \ref{gen_inst}, \ref{headings}, and
-	\ref{others} below.
-	
-	\section{General formatting instructions}
-	\label{gen_inst}
-	
-	The text must be confined within a rectangle 5.5~inches (33~picas)
-	wide and 9~inches (54~picas) long. The left margin is 1.5~inch
-	(9~picas).  Use 10~point type with a vertical spacing (leading) of
-	11~points.  Times New Roman is the preferred typeface throughout, and
-	will be selected for you by default.  Paragraphs are separated by
-	\nicefrac{1}{2}~line space (5.5 points), with no indentation.
-	
-	The paper title should be 17~point, initial caps/lower case, bold,
-	centered between two horizontal rules. The top rule should be 4~points
-	thick and the bottom rule should be 1~point thick. Allow
-	\nicefrac{1}{4}~inch space above and below the title to rules. All
-	pages should start at 1~inch (6~picas) from the top of the page.
-	
-	For the final version, authors' names are set in boldface, and each
-	name is centered above the corresponding address. The lead author's
-	name is to be listed first (left-most), and the co-authors' names (if
-	different address) are set to follow. If there is only one co-author,
-	list both author and co-author side by side.
-	
-	Please pay special attention to the instructions in Section \ref{others}
-	regarding figures, tables, acknowledgments, and references.
-	
-	\section{Headings: first level}
-	\label{headings}
-	
-	All headings should be lower case (except for first word and proper
-	nouns), flush left, and bold.
-	
-	First-level headings should be in 12-point type.
-	
-	\subsection{Headings: second level}
-	
-	Second-level headings should be in 10-point type.
-	
-	\subsubsection{Headings: third level}
-	
-	Third-level headings should be in 10-point type.
-	
-	\paragraph{Paragraphs}
-	
-	There is also a \verb+\paragraph+ command available, which sets the
-	heading in bold, flush left, and inline with the text, with the
-	heading followed by 1\,em of space.
-	
-	\section{Citations, figures, tables, references}
-	\label{others}
+	The cropped-digits are saved as \MATLAB arrays inside of their respective .mat files. Properly interpreting the \MATLAB files was a substantial issue at the outset as they are parsed fairly differently from things like CSV, and IDX.  The solution for interpreting the .mat files was to convert them into .npy files consisting of numpy arrays. One common part of pre-processing is converting the labels int a vector of one-hot vectors; however, for this application it was decided not to do any one-hot encoding 
+	to interface correctly with the Tensorflow loss function.
+
+	\section{Model Design}
+	\label{model}
 	
 	These instructions apply to everyone.
 	
@@ -273,7 +217,8 @@
 		\end{tabular}
 	\end{table}
 	
-	\section{Final instructions}
+	\section{Results}
+	\label{results}
 	
 	Do not change any aspects of the formatting parameters in the style
 	files.  In particular, do not modify the width or length of the
@@ -281,7 +226,11 @@
 	(except perhaps in the \textbf{References} section; see below). Please
 	note that pages should be numbered.
 	
-	\section{Preparing PDF files}
+	
+	\section{Conclusion}
+	\label{conc}
+	
+	\section{Acknowledgment}
 	
 	Please prepare submission files with paper size ``US Letter,'' and
 	not, for example, ``A4.''
