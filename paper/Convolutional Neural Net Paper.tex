@@ -21,6 +21,10 @@
 \usepackage{nicefrac}       % compact symbols for 1/2, etc.
 \usepackage{microtype}      % microtypography
 \usepackage{xspace}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subfig}
+\usepackage[section]{placeins}
 
 \title{Applying a Convolutional Neural Net to Street View House Numbers}
 
@@ -50,12 +54,7 @@
 	\maketitle
 	
 	\begin{abstract}
-		The abstract paragraph should be indented \nicefrac{1}{2}~inch
-		(3~picas) on both the left- and right-hand margins. Use 10~point
-		type, with a vertical spacing (leading) of 11~points.  The word
-		\textbf{Abstract} must be centered, bold, and in point size 12. Two
-		line spaces precede the abstract. The abstract must be limited to
-		one paragraph.
+		Classifying text from natural images can be an incredibly difficult computer vision problem. When a learned feature based classification approach is used, positive results can clearly be seen. By applying a convolutional nueral network to the SVHN dataset we can classify numbers with surprising accuracy, approaching that of the previous benchmark set MNIST
 	\end{abstract}
 	
 	\section{Introduction}
@@ -70,8 +69,8 @@
 	
 	\section{Street View House Numbers (SVHN) Dataset}
 	\label{dt_set}
-	
-	The SVHN dataset was compiled from a large number of Street View images from urban areas in various countries.  The house-numbers were extracted via a sliding window detector (cite source).  The dataset was then made available in two formats:
+		
+	The SVHN dataset was compiled from a large number of Street View images from urban areas in various countries.  The house-numbers were extracted via a sliding window detector [3].  The dataset was then made available in two formats:
 	
 	\begin{itemize}
 		\item Full Numbers - these are the original, variable resolution, color house-number images. Each image has character level bounding boxes and a transcription of the detected digits.
@@ -80,7 +79,7 @@
 		  
 	\end{itemize}
 	
-	As is explained in (cite source here), the original collection of images for SVHN were compiled with the intent of using an end-to-end system that first detects the location of a house number in a larger image, then uses a detection stage to classify each digit (0 through 9).  For the purposes of this work I utilized the more controlled version of cropped images.  The cropped images were selected because the task of locating, identifying and processing the original images is a separate problem in and of itself.
+	As is explained in [3], the original collection of images for SVHN were compiled with the intent of using an end-to-end system that first detects the location of a house number in a larger image, then uses a detection stage to classify each digit (0 through 9).  For the purposes of this work I utilized the more controlled version of cropped images.  The cropped images were selected because the task of locating, identifying and processing the original images is a separate problem in and of itself.
 	
 	The dataset is divided into a total of three subsets:
 	
@@ -92,8 +91,16 @@
 		
 	\end{itemize}
 
-	The first 2 subsets were obtained from a large number of Street View images. Even though SVHN-extra was generated in a similar manner, it is generally easier than SVHN-train and SVHN-test as a result of changes made to generate a dataset of such a large size.
+	The first two subsets were obtained from a large number of Street View images. Even though SVHN-extra was generated in a similar manner, it is generally easier than SVHN-train and SVHN-test as a result of changes made to generate a dataset of such a large size.
 	
+	\begin{figure}
+		\centering
+		\subfloat[Examples of SVHN full images]{{\includegraphics[width=6cm]{fullNum.png} }}%
+		\qquad
+		\subfloat[Examples of SVHN cropped images]{{\includegraphics[width=6cm]{32x32eg.png} }}%
+		\caption{Examples from SVHN Dataset}%
+		\label{fig:examps}%
+	\end{figure}
 	
 	\section{Data Pre-processing}
 	\label{pre-proc}
@@ -110,221 +117,58 @@
 	\section{Model Design}
 	\label{model}
 	
-	These instructions apply to everyone.
+	The model for this neural net is a relatively simple Tensorflow estimator.  The main structure of the model consists of two convolutional layers and two pooling layers which are alternated in order to pick out features and then reduce the size of the overall array.  The activation function used in each of the convolutional layers is ReLU.  After the last pooling layer there is a fully connected layer of 1024 nodes before the network finally produces its prediction.  During the final fully connected layer, A diagram of the overall network model can be found in Figure \ref{fig:model}
 	
-	\subsection{Citations within the text}
-	
-	The \verb+natbib+ package will be loaded for you by default.
-	Citations may be author/year or numeric, as long as you maintain
-	internal consistency.  As to the format of the references themselves,
-	any style is acceptable as long as it is used consistently.
-	
-	The documentation for \verb+natbib+ may be found at
-	\begin{center}
-		\url{http://mirrors.ctan.org/macros/latex/contrib/natbib/natnotes.pdf}
-	\end{center}
-	Of note is the command \verb+\citet+, which produces citations
-	appropriate for use in inline text.  For example,
-	\begin{verbatim}
-	\citet{hasselmo} investigated\dots
-	\end{verbatim}
-	produces
-	\begin{quote}
-		Hasselmo, et al.\ (1995) investigated\dots
-	\end{quote}
-	
-	If you wish to load the \verb+natbib+ package with options, you may
-	add the following before loading the \verb+nips_2017+ package:
-	\begin{verbatim}
-	\PassOptionsToPackage{options}{natbib}
-	\end{verbatim}
-	
-	If \verb+natbib+ clashes with another package you load, you can add
-	the optional argument \verb+nonatbib+ when loading the style file:
-	\begin{verbatim}
-	\usepackage[nonatbib]{nips_2017}
-	\end{verbatim}
-	
-	As submission is double blind, refer to your own published work in the
-	third person. That is, use ``In the previous work of Jones et
-	al.\ [4],'' not ``In our previous work [4].'' If you cite your other
-	papers that are not widely available (e.g., a journal paper under
-	review), use anonymous author names in the citation, e.g., an author
-	of the form ``A.\ Anonymous.''
-	
-	\subsection{Footnotes}
-	
-	Footnotes should be used sparingly.  If you do require a footnote,
-	indicate footnotes with a number\footnote{Sample of the first
-		footnote.} in the text. Place the footnotes at the bottom of the
-	page on which they appear.  Precede the footnote with a horizontal
-	rule of 2~inches (12~picas).
-	
-	Note that footnotes are properly typeset \emph{after} punctuation
-	marks.\footnote{As in this example.}
-	
-	\subsection{Figures}
-	
-	All artwork must be neat, clean, and legible. Lines should be dark
-	enough for purposes of reproduction. The figure number and caption
-	always appear after the figure. Place one line space before the figure
-	caption and one line space after the figure. The figure caption should
-	be lower case (except for first word and proper nouns); figures are
-	numbered consecutively.
-	
-	You may use color figures.  However, it is best for the figure
-	captions and the paper body to be legible if the paper is printed in
-	either black/white or in color.
-	\begin{figure}[h]
+	\begin{figure}
 		\centering
-		\fbox{\rule[-.5cm]{0cm}{4cm} \rule[-.5cm]{4cm}{0cm}}
-		\caption{Sample figure caption.}
+		\includegraphics[width=0.7\linewidth]{Model.png}
+		\captionsetup{width=0.7\linewidth}
+		\caption{Graphical representation of the neural network's model}
+		\label{fig:model}
 	\end{figure}
+
 	
-	\subsection{Tables}
 	
-	All tables must be centered, neat, clean and legible.  The table
-	number and title always appear before the table.  See
-	Table~\ref{sample-table}.
+	Early on, the design used three convolutional and pooling layers, it was later reduced to two to prevent unnecessary data loss. The first convolutional layer applies 25 filters each with a kernel size of 5-by-5 and implements zero-padding to ensure that the resulting output is the same dimensions as the input image. The second convolutional layer is very similar, the key difference being that it applies 50 filters as opposed to 25.
 	
-	Place one line space before the table title, one line space after the
-	table title, and one line space after the table. The table title must
-	be lower case (except for first word and proper nouns); tables are
-	numbered consecutively.
-	
-	Note that publication-quality tables \emph{do not contain vertical
-		rules.} We strongly suggest the use of the \verb+booktabs+ package,
-	which allows for typesetting high-quality, professional tables:
-	\begin{center}
-		\url{https://www.ctan.org/pkg/booktabs}
-	\end{center}
-	This package was used to typeset Table~\ref{sample-table}.
-	
-	\begin{table}[t]
-		\caption{Sample table title}
-		\label{sample-table}
-		\centering
-		\begin{tabular}{lll}
-			\toprule
-			\multicolumn{2}{c}{Part}                   \\
-			\cmidrule{1-2}
-			Name     & Description     & Size ($\mu$m) \\
-			\midrule
-			Dendrite & Input terminal  & $\sim$100     \\
-			Axon     & Output terminal & $\sim$10      \\
-			Soma     & Cell body       & up to $10^6$  \\
-			\bottomrule
-		\end{tabular}
-	\end{table}
+	The pooling layers utilize max pooling over a 2-by-2 filter meaning that after each pooling layer the output is approximately half of the size of the input. To evaluate the loss of network, after each iteration it uses Tensorflow's sparse softmax w/ cross entropy function. As mentioned earlier, the target labels are never one-hot encoded, which is because the loss function does not accept one-hot labels.
 	
 	\section{Results}
 	\label{results}
 	
-	Do not change any aspects of the formatting parameters in the style
-	files.  In particular, do not modify the width or length of the
-	rectangle the text should fit into, and do not change font sizes
-	(except perhaps in the \textbf{References} section; see below). Please
-	note that pages should be numbered.
+	Presented here in \ref{fig:metrics} are the results of applying the model discussed above in Section \ref{model} to the SVHN dataset. 
 	
+	\begin{figure}[!htb]
+		\centering
+		\subfloat[Graph of Accuracy over time]{{\includegraphics[width=6cm]{Accuracy.png} }}%
+		\qquad
+		\subfloat[Graph of loss over time]{{\includegraphics[width=6cm]{Loss.png} }}%
+		\caption{Graphs of loss metrics for the network}%
+		\label{fig:metrics}%
+	\end{figure}
+	
+	
+	In Figure \ref{fig:metrics} (b) the loss measured by our loss function takes a noticeable dip before leveling off around 0.4.  This behavior was not a surprise, and looks approximately as expected.
+	
+	As can be seen in Figure \ref{fig:metrics} (a) the overall accuracy of the network on the test set is roughly in the mid 80s.  When the accuracy is compared to that of a similar network applied to the MNIST dataset, (which averaged ~95\%) we can see that while the performance on our SVHN data isn't as good, it is  comparable in performance when the difference in difficulty between the two datasets is accounted for. Some possible changes that may be able to improve these results are tweaking of various hyper-parameters such as the learning rate, dropout rate, batch size, and the number of filters in each convolutional layer.
 	
 	\section{Conclusion}
 	\label{conc}
 	
-	\section{Acknowledgment}
+	In this paper I have shown how applying a convolutional neural network to the SVHN dataset yields expected and promising resluts. With more tweaking of hyper-parameters and sequencing of convolutional and pooling layers, I believe that a network similar to this can reach MNIST levels of accuracy and performance. All of these things point to how feature based convolutional neural networks are incredibly adaptive and powerful without much cost of performance.
 	
-	Please prepare submission files with paper size ``US Letter,'' and
-	not, for example, ``A4.''
-	
-	Fonts were the main cause of problems in the past years. Your PDF file
-	must only contain Type 1 or Embedded TrueType fonts. Here are a few
-	instructions to achieve this.
-	
-	\begin{itemize}
-		
-		\item You should directly generate PDF files using \verb+pdflatex+.
-		
-		\item You can check which fonts a PDF files uses.  In Acrobat Reader,
-		select the menu Files$>$Document Properties$>$Fonts and select Show
-		All Fonts. You can also use the program \verb+pdffonts+ which comes
-		with \verb+xpdf+ and is available out-of-the-box on most Linux
-		machines.
-		
-		\item The IEEE has recommendations for generating PDF files whose
-		fonts are also acceptable for NIPS. Please see
-		\url{http://www.emfield.org/icuwb2010/downloads/IEEE-PDF-SpecV32.pdf}
-		
-		\item \verb+xfig+ "patterned" shapes are implemented with bitmap
-		fonts.  Use "solid" shapes instead.
-		
-		\item The \verb+\bbold+ package almost always uses bitmap fonts.  You
-		should use the equivalent AMS Fonts:
-		\begin{verbatim}
-		\usepackage{amsfonts}
-		\end{verbatim}
-		followed by, e.g., \verb+\mathbb{R}+, \verb+\mathbb{N}+, or
-		\verb+\mathbb{C}+ for $\mathbb{R}$, $\mathbb{N}$ or $\mathbb{C}$.  You
-		can also use the following workaround for reals, natural and complex:
-		\begin{verbatim}
-		\newcommand{\RR}{I\!\!R} %real numbers
-		\newcommand{\Nat}{I\!\!N} %natural numbers
-		\newcommand{\CC}{I\!\!\!\!C} %complex numbers
-		\end{verbatim}
-		Note that \verb+amsfonts+ is automatically loaded by the
-		\verb+amssymb+ package.
-		
-	\end{itemize}
-	
-	If your file contains type 3 fonts or non embedded TrueType fonts, we
-	will ask you to fix it.
-	
-	\subsection{Margins in \LaTeX{}}
-	
-	Most of the margin problems come from figures positioned by hand using
-	\verb+\special+ or other commands. We suggest using the command
-	\verb+\includegraphics+ from the \verb+graphicx+ package. Always
-	specify the figure width as a multiple of the line width as in the
-	example below:
-	\begin{verbatim}
-	\usepackage[pdftex]{graphicx} ...
-	\includegraphics[width=0.8\linewidth]{myfile.pdf}
-	\end{verbatim}
-	See Section 4.4 in the graphics bundle documentation
-	(\url{http://mirrors.ctan.org/macros/latex/required/graphics/grfguide.pdf})
-	
-	A number of width problems arise when \LaTeX{} cannot properly
-	hyphenate a line. Please give LaTeX hyphenation hints using the
-	\verb+\-+ command when necessary.
-	
-	\subsubsection*{Acknowledgments}
-	
-	Use unnumbered third level headings for the acknowledgments. All
-	acknowledgments go at the end of the paper. Do not include
-	acknowledgments in the anonymized submission, only in the final paper.
 	
 	\section*{References}
 	
-	References follow the acknowledgments. Use unnumbered first-level
-	heading for the references. Any choice of citation style is acceptable
-	as long as you are consistent. It is permissible to reduce the font
-	size to \verb+small+ (9 point) when listing the references. {\bf
-		Remember that you can go over 8 pages as long as the subsequent ones contain
-		\emph{only} cited references.}
+
 	\medskip
 	
 	\small
 	
-	[1] Alexander, J.A.\ \& Mozer, M.C.\ (1995) Template-based algorithms
-	for connectionist rule extraction. In G.\ Tesauro, D.S.\ Touretzky and
-	T.K.\ Leen (eds.), {\it Advances in Neural Information Processing
-		Systems 7}, pp.\ 609--616. Cambridge, MA: MIT Press.
+	[1] MNIST. http://yann.lecun.com/exdb/mnist/
 	
-	[2] Bower, J.M.\ \& Beeman, D.\ (1995) {\it The Book of GENESIS:
-		Exploring Realistic Neural Models with the GEneral NEural SImulation
-		System.}  New York: TELOS/Springer--Verlag.
+	[2] SVHN. http://ufldl.stanford.edu/housenumbers/
 	
-	[3] Hasselmo, M.E., Schnell, E.\ \& Barkai, E.\ (1995) Dynamics of
-	learning and recall at excitatory recurrent synapses and cholinergic
-	modulation in rat hippocampal region CA3. {\it Journal of
-		Neuroscience} {\bf 15}(7):5249-5262.
+	[3] Yuval Netzer, Tao Wang, Adam Coates, Alessandro Bissacco, Bo Wu,\ \& Andrew Y.Ng\ (2011) Reading Digits in Natural Images with Unsupervised Feature Learning. {\it NIPS Workshop on Deep Learning and Unsupervised Feature Learning 2011}
 	
 \end{document}
