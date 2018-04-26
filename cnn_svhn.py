@@ -30,7 +30,6 @@ def cnn_model_fn(features, labels, mode):
     pool1 = tf.layers.max_pooling2d(inputs = conv1, pool_size = [2,2], strides = 2)
 
 	#set up second convolutional layer, same as the first but w/ 50 filters
-	
     conv2 = tf.layers.conv2d(
         inputs = pool1,
         filters = 50,

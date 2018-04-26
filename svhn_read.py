@@ -16,6 +16,8 @@ NUM_LABELS = 10
 NUM_CHANELS = 3
 last_percent_reported = None
 
+#loads in a matlab file and separates the picture arrays from the labels
+#then converts all of them to numpy arrays
 def process_data(file):
     data = scipy.io.loadmat(file)
     pics = data['X']
@@ -25,10 +27,13 @@ def process_data(file):
     pic_array = make_pics_arr(pics)
     return pic_array, labels
 
+#converts label array into array of one-hot labels
 def make_one_hot(labels):
     labels = (np.arange(NUM_LABELS) == labels[:, None]).astype(np.float32)
     return labels
 
+#steps through the array and converts the individual channel arrays
+#into 1 3d numpy array for each image
 def make_pics_arr(pic_arr):
     rows = pic_arr.shape[0]
     cols = pic_arr.shape[1]
@@ -45,6 +50,7 @@ def make_pics_arr(pic_arr):
 
     return new_arr
 
+#conditional statement used to ensure that the correct file is being loaded
 def get_file_name(dataset):
     if dataset == "train":
         file_name = "train_32x32.mat"
@@ -57,6 +63,10 @@ def get_file_name(dataset):
 
     return file_name
 
+#checks for necessary training and test files
+#if the files aren't present it downloads them
+#and then returns the data to be passed to the 
+#processing function
 def create_sets(dataset):
     df_name = get_file_name(dataset)
     df_pointer = os.path.join(DATA_PATH, df_name)
@@ -76,12 +86,16 @@ def create_sets(dataset):
         new_file = do_down(DATA_PATH, df_name)
         return readf(new_file)
 
+#opens the file, calls the proccessing function and then closes the file
 def readf(file_name):
     file = open(file_name, 'rb')
     data = process_data(file)
     file.close()
     return data
 
+#Downloads the desired files from the internet and 
+#checks that the file was downloaded correctly into the
+#correct place
 def do_down(path, filename):
     base_url = "http://ufldl.stanford.edu/housenumbers/"
     print("Attempting download of:  ", filename)
@@ -97,6 +111,7 @@ def do_down(path, filename):
         raise Exception("Failed to verify "+filename)
     return down_file
 
+#outputs the progress of the download
 def prog_down(count, block_size, total_size):
     global last_percent_reported
     percent = int(count * block_size * 100 / total_size)
@@ -109,6 +124,8 @@ def prog_down(count, block_size, total_size):
             sys.stdout.flush()
         last_percent_reported = percent
 
+#conditional holds the hardcoded value for each vile size to
+#verify against after download
 def get_expected_bytes(filename):
     if filename == "train_32x32.mat":
         byte_size = 182040794
@@ -120,6 +137,7 @@ def get_expected_bytes(filename):
         raise Exception("Invalid file name " + filename)
     return byte_size
 
+#calls the set creator and file processors for both the training and test sets
 def file_gen():
     train_data, train_labels = create_sets('train')
     write_npy_file(train_data, train_labels, 'train')
@@ -127,15 +145,20 @@ def file_gen():
     test_data, test_labels = create_sets('test')
     write_npy_file(test_data, test_labels, 'test')
 
+#calls the set creator and file processor for the extra set
+#this is placed into a separate function because the extra set
+#takes a long time for both downloading and processing
 def extra_set_gen():
     extra_data, extra_labels = create_sets('extra')
     write_npy_file(extra_data, extra_labels, 'extra')
 
+#loads the desired .npy file for both the pics and the labels then returns those arrays	
 def load_data(setname):
     pics = np.load(os.path.join(DATA_PATH, setname+'_svhn_pics.npy'))
     labels = np.load(os.path.join(DATA_PATH, setname+'_svhn_labels.npy'))
     return pics, labels
 
+#takes the processed arrays and writes them to .npy files, fails if the file already exists	
 def write_npy_file(data_array, label_array, setname):
     ndat_pointer = os.path.join(DATA_PATH, setname+'_svhn_pics.npy')
     nlabel_pointer = os.path.join(DATA_PATH, setname+'_svhn_labels.npy')
